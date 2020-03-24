@@ -62,6 +62,8 @@ app.post("/api/notes", function(req, res) {
 // API route that allows user to delete a note and updates json data
 app.delete("/api/notes/:id", function(req, res) {
     const selectedNoteId = req.params.id;
+    // console.log(selectedNoteId);
+    // Read and remove new note to json data
     readFileAsync("./db/db.json", "utf8").then(function(data) {
         // Turn data object into string, splice selected Note by id to remove from array and reset index.
         data = JSON.parse(data);
@@ -76,6 +78,8 @@ app.delete("/api/notes/:id", function(req, res) {
     });
 });
 
+// Starts the server to begin listening
+// =============================================================
 app.listen(PORT, function() {
     console.log("App listening on PORT " + PORT);
   });
