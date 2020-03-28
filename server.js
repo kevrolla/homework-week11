@@ -1,85 +1,71 @@
+const fs = require("fs");
 const express = require("express");
 const path = require("path");
-const fs = require("fs");
-const util = require("util");
 
-const readFileAsync = util.promisify(fs.readFile);
-const writeFileAsync = util.promisify(fs.writeFile);
-
-
-// Sets up the Express App
-// =============================================================
+//set up server
 const app = express();
-const PORT = process.env.PORT || 8080;
-
-// Sets up the Express app to handle data parsing
-app.use(express.urlencoded({ extended: true }));
+//PORT
+const PORT = process.env.PORT || 3000;
+app.use(express.urlencoded({ extended: true}));
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static('public'));
 
 
+//read db.json
 
-// HTML Routes
-// =============================================================
-// Basic route that sends the user first to the Home Page
-app.get("/", function(req, res) {
-    res.sendFile(path.join(__dirname, "public/index.html"));
+//get title and note
+
+
+//views
+app.get("/", function(req, res){
+    res.sendFile(path.join(__dirname, "/index.html"));
 });
+app.get("/notes", function(req,res){
+    res.sendFile(path.join(__dirname, "/notes.html"));
+})
 
-// Route that sends the user to the view notes/AJAX Page
-app.get("/notes", function(req, res) {
-    res.sendFile(path.join(__dirname, "public/notes.html"));
-});
-
-
-// API Routes
-// =============================================================
-// API route that reads the json file with notes
-app.get("/api/notes", function(req, res) {
-    readFileAsync("./db/db.json", "utf8").then(function(data) {
-        data = JSON.parse(data);
-        // console.log(data)
-        return res.json(data);
-    });
-});
-  
-// API route that allows user to add new note, updates json data and displays on browser
-app.post("/api/notes", function(req, res) {
-    const newNote = req.body;
-
-    // Read and push new note to json data
-    readFileAsync("./db/db.json", "utf8").then(function(data) { 
-        data = JSON.parse(data);
-        data.push(newNote);
-        data[data.length - 1].id = data.length - 1;
-        // Update and write the json data with new notes
-        writeFileAsync("./db/db.json", JSON.stringify(data));
-        res.json(data);
-        console.log("Note succesfully created!");
-    });
-});
-
-// API route that allows user to delete a note and updates json data
-app.delete("/api/notes/:id", function(req, res) {
-    const selectedNoteId = req.params.id;
-    // console.log(selectedNoteId);
-    // Read and remove new note to json data
-    readFileAsync("./db/db.json", "utf8").then(function(data) {
-        // Turn data object into string, splice selected Note by id to remove from array and reset index.
-        data = JSON.parse(data);
-        data.splice(selectedNoteId, 1);
-        for (var i = 0; i < data.length; i++) {
-            data[i].id = i;
+app.get("/api/notes", function(req, res){
+    res.sendFile(path.join(__dirname, "/db.json"));
+})
+//Post a Note
+app.post("/api/notes", function(req, res){
+    let newNote = req.body;
+    fs.readFile(path.join(__dirname, "/db.json"), "utf-8", function(err, data){
+        if (err) throw err;
+        let db = JSON.parse(data);
+        db.push(newNote);
+        var idNum = 0
+        //key
+        for(i = 0; i < db.length; i++){
+            db[i].id = idNum ++;
         }
-        // Update the json data with removed notes
-        writeFileAsync("./db/db.json", JSON.stringify(data));
-        res.json(data);
-        console.log("Note succesfully removed!");
-    });
+        fs.writeFile(path.join(__dirname, "/db.json"), JSON.stringify(db), function(err){
+            if (err) throw err;
+            console.log("note added");
+        });
+    })
 });
 
-// Starts the server to begin listening
-// =============================================================
-app.listen(PORT, function() {
-    console.log("App listening on PORT " + PORT);
-  });
+//delete note
+app.delete("/api/notes/:id", function(req,res){
+    fs.readFile(path.join(__dirname, "/db.json"), "utf-8", function(err){
+        if (err) throw err;
+        
+        let db = JSON.parse(data);
+        var noteID = parseInt(req.params.id);
+        console.log(db);
+        console.log(noteID);
+        //return new arr with items that were selected
+        var newDB = db.filter(num => num.id != noteID);
+                 
+        fs.writeFile(path.join(__dirname, "/db.json"), JSON.stringify(newDB), function(err){
+            if (err) throw err;
+            console.log("note deleted");
+            
+        })
+    })
+});
+//start server
+app.listen(PORT, function(){
+    console.log("listening on port:" + PORT)
+})
