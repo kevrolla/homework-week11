@@ -1,71 +1,17 @@
-const fs = require("fs");
 const express = require("express");
-const path = require("path");
+const apiRoutes = require("./routes/apiRoutes");
+const htmlRoutes = require("./routes/htmlRoutes");
 
-//set up server
+// Initialize the app and create a port
 const app = express();
-//PORT
 const PORT = process.env.PORT || 3000;
-app.use(express.urlencoded({ extended: true}));
+
+// Set up body parsing, static, and route middleware
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+app.use("/api", apiRoutes);
+app.use("/", htmlRoutes);
 
-
-//read db.json
-
-//get title and note
-
-
-//views
-app.get("/", function(req, res){
-    res.sendFile(path.join(__dirname, "/index.html"));
-});
-app.get("/notes", function(req,res){
-    res.sendFile(path.join(__dirname, "/notes.html"));
-})
-
-app.get("/api/notes", function(req, res){
-    res.sendFile(path.join(__dirname, "/db.json"));
-})
-//Post a Note
-app.post("/api/notes", function(req, res){
-    let newNote = req.body;
-    fs.readFile(path.join(__dirname, "/db.json"), "utf-8", function(err, data){
-        if (err) throw err;
-        let db = JSON.parse(data);
-        db.push(newNote);
-        var idNum = 0
-        //key
-        for(i = 0; i < db.length; i++){
-            db[i].id = idNum ++;
-        }
-        fs.writeFile(path.join(__dirname, "/db.json"), JSON.stringify(db), function(err){
-            if (err) throw err;
-            console.log("note added");
-        });
-    })
-});
-
-//delete note
-app.delete("/api/notes/:id", function(req,res){
-    fs.readFile(path.join(__dirname, "/db.json"), "utf-8", function(err){
-        if (err) throw err;
-        
-        let db = JSON.parse(data);
-        var noteID = parseInt(req.params.id);
-        console.log(db);
-        console.log(noteID);
-        //return new arr with items that were selected
-        var newDB = db.filter(num => num.id != noteID);
-                 
-        fs.writeFile(path.join(__dirname, "/db.json"), JSON.stringify(newDB), function(err){
-            if (err) throw err;
-            console.log("note deleted");
-            
-        })
-    })
-});
-//start server
-app.listen(PORT, function(){
-    console.log("listening on port:" + PORT)
-})
+// Start the server on the port
+app.listen(PORT, () => console.log(`Listening on PORT: ${PORT}`));

@@ -1,29 +1,15 @@
 {
-  "name": "homework-week11",
+  "name": "note-taker",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kevrolla/homework-week11.git"
-  },
-  "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/kevrolla/homework-week11/issues"
-  },
-  "homepage": "https://github.com/kevrolla/homework-week11#readme",
   "dependencies": {
-    "express": "^4.17.1",
-    "fs": "0.0.1-security",
-    "mysql": "^2.18.1",
-    "path": "^0.12.7",
-    "util": "^0.12.2"
-  },
-  "devDependencies": {},
-  "description": ""
+    "express": "^4.16.4",
+    "uuid": "^3.4.0"
+  }
 }
